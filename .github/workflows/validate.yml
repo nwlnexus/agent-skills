@@ -13,9 +13,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - name: Install shellcheck
-        run: sudo apt-get update -q && sudo apt-get install -y -q shellcheck
-      - name: Validate skills
+      - name: Install shellcheck and PyYAML
+        run: sudo apt-get update -q && sudo apt-get install -y -q shellcheck python3-yaml
+      - name: Validate skills, agents, fragments and templates
         run: sh scripts/validate-skills.sh
       - name: markdownlint
         uses: DavidAnson/markdownlint-cli2-action@v22
