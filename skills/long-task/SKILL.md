@@ -148,9 +148,21 @@ Let the repo's hooks run on push (never `--no-verify`). Wait for CI on the draft
 5. After merge: pull `main` in the main checkout, deploy and verify production when the issue requires it, and
    close the issue with an evidence comment.
 
-If a permission rule or the auto-mode classifier denies a merge, retry once with the narrowest form of the
-command; if it is denied again, record `blocked: <rule or reason>` in Blocked-on and the PR, apply the repo's
-auto-merge label if it has one, and say so. Do not route around a denial.
+If a merge (or `gh pr ready`, `gh pr update-branch`) is denied by a permission rule or the auto-mode
+classifier:
+
+1. Read the last line of `${XDG_STATE_HOME:-$HOME/.local/state}/agent/denials.jsonl` (written by the
+   `permission-denied-log.sh` hook): `tail -n 1 … | jq -c '{ts, tool, reason, cmd: .tool_input.command}'`. Its
+   `reason` names the rule. A denial with no rule name ("no verdict") is transient.
+2. Retry once, with the narrowest form of the command (`gh pr merge <n> --squash --delete-branch`, no `--admin`).
+3. Denied again: apply the repo's auto-merge label (`gh pr edit <n> --add-label automerge`) and let the
+   `automerge` workflow merge once the required checks pass. Watch for the merge (`gh pr view <n> --json state`).
+4. Only if the label path also fails (no label in the repo, or the workflow run fails), record
+   `blocked: <rule>` in Blocked-on and on the PR, with the denial log line, and report it to the owner.
+
+Never report "needs owner" or "blocked" without the rule name from the log. Do not route around a denial: no
+other tool, wrapper or rephrasing that does the same thing. The same reading of the log applies to any other
+denial during the task: name the rule when you record or report it.
 
 ## Step 10: close out
 
