@@ -28,12 +28,14 @@ It also holds the **session harness** every Claude session on the owner's hosts 
 | --- | --- |
 | [`fragments/session-contract.md`](fragments/session-contract.md) | The session contract (progress file, goal, verify-before-done, effort, registry, parallelism, naming, cross-session messages). Nix appends its body, without the frontmatter, to each Claude dir's global `CLAUDE.md` between managed markers. |
 | [`templates/progress.md`](templates/progress.md) | The progress-file template `long-task` copies (`skills/long-task/progress-template.md` links to it). Sections: Goal, Done-when checks, Plan, Evidence log, Decisions, Blocked-on, Next. |
+| [`hooks/progress-stale.sh`](hooks/progress-stale.sh) | Stop hook (POSIX sh, tests in `tests/progress-stale.sh`). Reads the hook JSON on stdin; when the work tree has a `docs/progress/*.md` file older than 20 minutes it prints `progress file <path> last updated <n> minutes ago`, otherwise nothing. Never prints a decision, always exits 0. Nix merges it into each Claude dir's `settings.json` as a `Stop` hook. |
 
 ## Layout
 
 ```text
 skills/<name>/SKILL.md        # frontmatter: name, description (the trigger) + the procedure
 skills/<name>/scripts/…       # anything the procedure copies into a target repo
+hooks/<name>.sh               # POSIX sh hook scripts (Claude Code hook JSON on stdin); tests in tests/<name>.sh
 agents/<name>.md              # Claude Code subagent: frontmatter (name, description, tools, model, effort, memory) + system prompt
 fragments/<name>.md           # text appended to a managed file; frontmatter (name, description, target) is stripped
 templates/<name>.md           # files a skill copies into a target repo

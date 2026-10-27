@@ -9,6 +9,8 @@
 #                           appends to CLAUDE.md) starts with a `## ` heading, has no `# ` heading outside code
 #                           fences and never contains the managed-block markers.
 #   templates/progress.md   has every section the long-task skill relies on.
+#   hooks/<name>.sh         passes `sh -n` and shellcheck (when installed), is executable, and its test
+#                           tests/<name>.sh (when present) passes.
 # Every frontmatter block must parse as a YAML mapping (checked with python3 + PyYAML when available, so a
 # stray ` #` or `: ` in a plain scalar cannot silently truncate a description).
 set -u
@@ -160,5 +162,26 @@ if [ -f "$tpl" ]; then
 else
   err "templates/progress.md is missing (the long-task skill copies it)"
 fi
+
+# --- hooks ----------------------------------------------------------------------------------------------------
+for hook in "$ROOT"/hooks/*.sh; do
+  [ -f "$hook" ] || continue
+  name=$(basename "$hook" .sh)
+  start=$errors
+  sh -n "$hook" || err "hook $name: syntax error"
+  [ -x "$hook" ] || err "hook $name: not executable"
+  if command -v shellcheck >/dev/null 2>&1; then
+    shellcheck "$hook" || err "hook $name: shellcheck failed"
+  fi
+  if [ -f "$ROOT/tests/$name.sh" ]; then
+    if command -v shellcheck >/dev/null 2>&1; then
+      shellcheck "$ROOT/tests/$name.sh" || err "hook $name: shellcheck failed on tests/$name.sh"
+    fi
+    sh "$ROOT/tests/$name.sh" >/dev/null || err "hook $name: tests/$name.sh failed (run it to see which check)"
+  else
+    err "hook $name: missing tests/$name.sh"
+  fi
+  ok "hook $name"
+done
 
 exit $fail
