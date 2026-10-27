@@ -75,6 +75,7 @@ dir's `CLAUDE.md`).
    `target`; the body starts with a level-2 heading.
 5. `scripts/validate-skills.sh` runs in CI and locally (frontmatter must parse as YAML: quote a
    description that contains a colon followed by a space, or a space followed by `#`).
+6. To merge without a merge command, label the PR `automerge` (`gh pr edit <n> --add-label automerge`) and `.github/workflows/automerge.yml` squash-merges it once the base branch's required checks pass (GitHub App credentials: olympus-sdk#576).
 
 ## License
 
