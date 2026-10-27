@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(systemctl show *)",
+      "Bash(systemctl is-active *)",
+      "Bash(systemctl status *)",
+      "Bash(journalctl -u *)",
+      "Bash(journalctl --user -u *)",
+      "Bash(tmux ls)",
+      "Bash(tmux list-sessions)",
+      "Bash(shellcheck *)",
+      "Bash(actionlint)",
+      "Bash(actionlint *)",
+      "Bash(scripts/validate-skills.sh)"
+    ]
+  }
+}
