@@ -9,8 +9,8 @@
 #                           appends to CLAUDE.md) starts with a `## ` heading, has no `# ` heading outside code
 #                           fences and never contains the managed-block markers.
 #   templates/progress.md   has every section the long-task skill relies on.
-#   hooks/<name>.sh         passes `sh -n` and shellcheck (when installed), is executable, and its test
-#                           tests/<name>.sh (when present) passes.
+#   hooks/<name>.sh         passes `sh -n` and shellcheck (when installed), is executable, has a row in
+#                           README.md, and its test tests/<name>.sh (required) passes.
 # Every frontmatter block must parse as a YAML mapping (checked with python3 + PyYAML when available, so a
 # stray ` #` or `: ` in a plain scalar cannot silently truncate a description).
 set -u
@@ -170,6 +170,7 @@ for hook in "$ROOT"/hooks/*.sh; do
   start=$errors
   sh -n "$hook" || err "hook $name: syntax error"
   [ -x "$hook" ] || err "hook $name: not executable"
+  grep -q "(hooks/$name.sh)" "$ROOT/README.md" || err "hook $name: no row in README.md"
   if command -v shellcheck >/dev/null 2>&1; then
     shellcheck "$hook" || err "hook $name: shellcheck failed"
   fi
