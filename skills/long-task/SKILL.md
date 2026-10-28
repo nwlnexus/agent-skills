@@ -43,7 +43,7 @@ If the issue has no "Done when", write one with a stated check per clause, post 
 When the `memory` MCP server is connected (tools `remember`, `list_recent`, `set_status`):
 
 1. `list_recent` with `tag: "session-registry"` and `project: "github.com/<owner>/<repo>"`. Only `kind: "event"`
-   facts whose content starts with `session ` are registrations (extracted facts can carry the tag too). If an
+   facts whose content starts with the word `session` are registrations (extracted facts can carry the tag too). If an
    `active` registration names the same
    `<repo>#<issue>` and another session, and that session is still live (it appears in `ListAgents`, or the fact
    is under 12 hours old when `ListAgents` is not available), **stop**: report who holds the issue and do not
