@@ -45,8 +45,11 @@ When the `memory` MCP server is connected (tools `remember`, `list_recent`, `set
 1. `list_recent` with `tag: "session-registry"` and the repo's `cwd`. If an `active` fact names the same
    `<repo>#<issue>` and another session, and that session is still live (it appears in `ListAgents`, or the fact
    is under 12 hours old when `ListAgents` is not available), **stop**: report who holds the issue and do not
-   start. A stale registration (session gone, older than 12 hours) is set to `deprecated` with `set_status`, and
-   noted in Decisions.
+   start. Show the registration (id, content, age) in the stop message. SessionStart recall already lists active
+   registrations for the cwd (gateway `Q-SESSION-START`), so one seen there is the same evidence. Only the owner
+   may override, by saying so in this session or on the issue; then log the override in Decisions and register as
+   a new session (`-<part>` suffix when it is a disjoint piece). A stale registration (session gone, older than
+   12 hours) is set to `deprecated` with `set_status`, and noted in Decisions.
 2. `remember` with `content: "session <name> on <host> works <owner/repo>#<issue> on <branch>"`,
    `kind: "event"`, `tags: ["session-registry", "<repo>#<issue>"]`, `cwd: <repo path>`, `status: "active"`.
    Keep the returned `id` for the progress file and for step 10.
@@ -166,7 +169,9 @@ denial during the task: name the rule when you record or report it.
 
 ## Step 10: close out
 
-- `set_status` the registration `id` to `deprecated` (task finished or abandoned).
+- `set_status` the registration `id` to `deprecated` (task finished or abandoned, including a goal that ends
+  impossible or is cleared). Check with `list_recent` (`tag: "session-registry"`) that no `active` fact of this
+  session remains.
 - Message the live sessions on the same repo that `main` moved.
 - Remove the worktree and delete the local and remote task branch once merged.
 
